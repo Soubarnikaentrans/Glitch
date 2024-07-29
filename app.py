@@ -6,11 +6,25 @@ import string
 from flask import Flask, request, jsonify, render_template
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+import requests
+import os
 
 nltk.download('punkt')
 nltk.download('stopwords')
 
 app = Flask(__name__)
+
+# URL of the PDF on GitHub
+pdf_url = "https://github.com/Soubarnikaentrans/Glitch/main/report.pdf"
+pdf_path = "report.pdf"
+
+# Download the PDF from GitHub
+def download_pdf(url, path):
+    response = requests.get(url)
+    with open(path, 'wb') as file:
+        file.write(response.content)
+
+download_pdf(pdf_url, pdf_path)
 
 def extract_text_from_pdf(pdf_path):
     document = fitz.open(pdf_path)
@@ -28,7 +42,6 @@ def preprocess_text(text):
     tokens = [[token for token in sentence if token not in stopwords.words('english')] for sentence in tokens]
     return [" ".join(sentence) for sentence in tokens], sentences
 
-pdf_path = 'report.pdf'  
 pdf_text = extract_text_from_pdf(pdf_path)
 processed_text, original_sentences = preprocess_text(pdf_text)
 
